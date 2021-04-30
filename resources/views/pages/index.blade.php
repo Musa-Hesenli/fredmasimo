@@ -1,4 +1,10 @@
 @extends('includes.main')
+@section('title')
+    <meta name="description" content="BarberShop & Hair Salon HTML Template, {{ $seo->getTranslatedAttribute('seo_description') }}">
+    <meta name="author" content="DynamicLayers">
+    <meta name="keywords" content="{{ $seo->getTranslatedAttribute('seo_keywords') }}">
+    <title>{{ $seo->getTranslatedAttribute('seo_title') }}</title>
+@endsection
 @section('content')
 <section class="slider_section">
     <ul id="main-slider" class="owl-carousel main_slider">

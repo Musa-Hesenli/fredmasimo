@@ -1,4 +1,5 @@
-
+<a data-scroll href="#header" id="scroll-to-top"><i class="arrow_up"></i></a>
+	
 		<link rel="shortcut icon" type="image/x-icon" href="{{ asset('img/Favicon.png') }}">
 
         <!-- Elegant Font Icons CSS -->

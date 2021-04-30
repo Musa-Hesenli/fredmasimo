@@ -30,8 +30,12 @@ use App\Vacancy;
 use App\HeaderFooter;
 use App\ProductsSeo;
 use App\ContactUss;
+use App\Models\AboutDataAndSeo;
+use App\Models\Barber;
 use App\Models\Comment;
 use App\Models\HomeDataAndSeo;
+use App\Models\Service;
+use App\Models\ServicesDataAndSeo;
 use App\Models\Slider;
 use App\Models\Subscriber;
 use App\SearchPage;
@@ -163,67 +167,43 @@ class PageController extends Controller
         return Slug::withTranslation('en')->orderBy('order')->get();
     }
 
-
-    public function index($locale) {
+    public function index($locale)
+    {
         $lang = $this->locale($locale);
         $menu = $this->menu();
         $home_seo = HomeDataAndSeo::withTranslation('en')->first();
         $sliders = Slider::withTranslation('en')->get();
         $comments = Comment::withTranslation('en')->get();
-        return view('pages.index', compact("home_seo", "sliders", 'comments'));
+        $seo = $home_seo;
+        return view('pages.index', compact("home_seo", "sliders", 'comments', 'menu', 'seo'));
     }
 
 
     public function about($locale)
     {
         $lang = $this->locale($locale);
-
         $menu = $this->menu();
-
-        $slugs = Slug::withTranslation('en', 'ru')->orderBy('order')->get();
-
-        $categories = Size::withTranslation('en', 'ru')->where('menu', 1)->get();
-
-        $about = About::withTranslation('en', 'ru')->take(1)->get();
-        $seo = $about;
-        $sertificates = Sertificate::withTranslation('en', 'ru')->orderBy('id')->get();
-        $headFoot = HeaderFooter::withTranslation('en', 'ru')->take(1)->get();
-
-        return view('about', compact(['lang', 'menu', 'slugs', 'categories', 'about', 'sertificates', 'seo', 'headFoot']));
+        $home_seo = HomeDataAndSeo::withTranslation('en')->first();
+        $seo = AboutDataAndSeo::withTranslation('en')->first();
+        $barbers = Barber::withTranslation('en')->get();
+        return view('pages.about', compact('menu', 'home_seo', 'seo', 'barbers'));
     }
-    public function search(Request $request, $locale)
+
+    public function all_services($locale)
     {
-
-        $text = $request->text;
-
         $lang = $this->locale($locale);
-
         $menu = $this->menu();
-        $slugs = Slug::withTranslation('en', 'ru')->orderBy('order')->get();
-        $categories = Size::withTranslation('en', 'ru')->where('menu', 1)->get();
-        $headFoot = HeaderFooter::withTranslation('en', 'ru')->take(1)->get();
-        $search = SearchPage::withTranslation('en', 'ru')->take(1)->get();
-
-        $category = Size::whereTranslation('search_text', 'LIKE', '%' . $text . '%')->take(1)->get();
-        if (count($category) > 0) :
-            $products = Product::where('category', $category[0]->id)
-                ->with('categoryData')
-                ->get();
-        else :
-            $products = Product::whereTranslation('name', 'LIKE', '%' . $text . '%')
-                ->with('categoryData')
-                ->orWhere('sub_text', 'LIKE', '%' . $text . '%')
-                ->orWhere('sub_title', 'LIKE', '%' . $text . '%')
-                ->get();
-        endif;
-
-        return view('search', compact(['lang', 'menu', 'slugs', 'categories', 'headFoot', 'products', 'text', 'search']));
+        $home_seo = HomeDataAndSeo::withTranslation('en')->first();
+        $seo = ServicesDataAndSeo::withTranslation('en')->first();
+        $services = Service::withTranslation('en')->get();
+        return view('pages.services', compact('menu', 'seo', 'home_seo', 'services'));
     }
 
-    public function add_subscriber(Request $request) {
+    public function add_subscriber(Request $request)
+    {
         $sub = new Subscriber();
         $sub->email = $request->email;
-        if($sub->save()) {
+        if ($sub->save()) {
             return redirect()->back();
         }
         return "error occurred";

@@ -5,9 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="BarberShop & Hair Salon HTML Template">
-    <meta name="author" content="DynamicLayers">
-    <title>Fred Masimo || BarberShop Hair Salon</title>
+    @yield('title')
     @include('includes.links')
 </head>
 
@@ -18,7 +16,7 @@
 
     <div id='preloader'>
         <div class='loader'>
-            <img src="{{ asset("img/loading.gif") }}" width="80" style="padding-bottom: 20px;">
+            <img src="{{ asset('img/loading.gif') }}" width="80" style="padding-bottom: 20px;">
         </div>
     </div><!-- Preloader -->
 
