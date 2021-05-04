@@ -1,7 +1,7 @@
 <header id="header" class="header-section">
     <div class="container">
     <nav class="navbar ">
-            <a href="index-en.php" class="navbar-brand"><img src="img/1Artboard 1.svg"  alt="Barbershop"></a>
+            <a href="index-en.php" class="navbar-brand"><img src="{{ asset('img/1Artboard 1.svg') }}"  alt="Barbershop"></a>
             <div class="d-flex menu-wrap align-items-center">
                <div id="mainmenu" class="mainmenu">
                    <ul class="nav">

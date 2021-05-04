@@ -33,7 +33,16 @@ use App\ContactUss;
 use App\Models\AboutDataAndSeo;
 use App\Models\Barber;
 use App\Models\Comment;
+use App\Models\ContactDataAndSeo;
+use App\Models\GalleryCategory;
+use App\Models\GalleryDataSeo;
+use App\Models\GalleryImage;
 use App\Models\HomeDataAndSeo;
+use App\Models\PriceList;
+use App\Models\PriceListDataAndSeo;
+use App\Models\Product as ModelsProduct;
+use App\Models\ProductCategory;
+use App\Models\ProductsSeo as ModelsProductsSeo;
 use App\Models\Service;
 use App\Models\ServicesDataAndSeo;
 use App\Models\Slider;
@@ -199,6 +208,18 @@ class PageController extends Controller
         return view('pages.services', compact('menu', 'seo', 'home_seo', 'services'));
     }
 
+    public function gallery($locale) {
+        $lang = $this->locale($locale);
+        $menu = $this->menu();
+        $home_seo = HomeDataAndSeo::withTranslation('en')->first();
+        $seo = GalleryDataSeo::withTranslation('en')->first();
+        $categories = GalleryCategory::withTranslation('en')->get();
+        $images = GalleryImage::with('filter')->get();
+        return view('pages.gallery', compact('menu', 'home_seo', 'seo', 'categories', 'images'));
+    } 
+
+
+    // Post functions begin
     public function add_subscriber(Request $request)
     {
         $sub = new Subscriber();
@@ -207,5 +228,62 @@ class PageController extends Controller
             return redirect()->back();
         }
         return "error occurred";
+    }
+
+    // Products functions begin
+    public function products($locale, $slug2 = null){
+        if($slug2) {
+            return $this->products_filter($locale, $slug2);
+        }
+        $lang = $this->locale($locale);
+        $menu = $this->menu();
+        $home_seo = HomeDataAndSeo::withTranslation('en')->first();
+        $seo = ModelsProductsSeo::withTranslation('en')->first();
+        $categories = ProductCategory::withTranslation('en')->get();
+        $products = ModelsProduct::withTranslation('en')->with('category_data')->paginate(6);
+        return view('pages.products', compact('menu', 'home_seo', 'seo','categories', 'products'));
+    }
+    public function products_filter($locale, $category) {
+        $lang = $this->locale($locale);
+        $menu = $this->menu();
+        $home_seo = HomeDataAndSeo::withTranslation('en')->first();
+        $seo = ModelsProductsSeo::withTranslation('en')->first();
+        $category = ProductCategory::where('slug', $category)->first();
+        $category =  $category['id'];
+        $categories = ProductCategory::withTranslation('en')->get();
+        $products = ModelsProduct::withTranslation('en')->whereTranslation('category', $category)->with('category_data')->paginate(6);
+        return view('pages.products', compact('menu', 'home_seo', 'seo','categories', 'products'));
+    }
+    public function search_products(Request $query) {
+        return $query;
+        // $lang = $this->locale($locale);
+        $menu = $this->menu();
+        $home_seo = HomeDataAndSeo::withTranslation('en')->first();
+        $seo = ModelsProductsSeo::withTranslation('en')->first();
+        $categories = ProductCategory::withTranslation('en')->get();
+        $products = ModelsProduct::withTranslation('en')->whereTranslation('name', 'LIKE','%' . $query['q'] . '%')->with('category_data')->paginate(6);
+        return view('pages.products', compact('menu', 'home_seo', 'seo','categories', 'products'));
+    }
+
+    // Products function end
+
+    public function price($locale) {
+        $lang = $this->locale($locale);
+        $menu = $this->menu();
+        $home_seo = HomeDataAndSeo::withTranslation('en')->first();
+        $seo =  PriceListDataAndSeo::withTranslation('en')->first();
+        $categories = ProductCategory::withTranslation('en')->get();
+        $price_list = PriceList::withTranslation('en')->get();
+        return view('pages.price', compact('menu', 'home_seo', 'seo', 'price_list'));
+    }
+
+    public function contact($locale) {
+        $lang = $this->locale($locale);
+        $menu = $this->menu();
+        $home_seo = HomeDataAndSeo::withTranslation('en')->first();
+        $seo =  ContactDataAndSeo::withTranslation('en')->first();
+        $categories = ProductCategory::withTranslation('en')->get();
+        $price_list = PriceList::withTranslation('en')->get();
+        return view('pages.contact', compact('menu', 'home_seo', 'seo', 'price_list'));
     }
 }

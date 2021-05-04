@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
 });
+Route::get('/search-products', [PageController::class, 'search_products']);
 Route::post("add-subscriber", [PageController::class, 'add_subscriber']);
 Route::get('/lang', [PageController::class, 'lang']);
 Route::get('/{slug1?}/{slug2?}/{slug3?}', [PageController::class, 'slug']);
