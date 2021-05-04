@@ -22,5 +22,6 @@ Route::group(['prefix' => 'admin'], function () {
 });
 Route::get('/search-products', [PageController::class, 'search_products']);
 Route::post("add-subscriber", [PageController::class, 'add_subscriber']);
+Route::post("/add-message", [PageController::class, 'add_message']);
 Route::get('/lang', [PageController::class, 'lang']);
 Route::get('/{slug1?}/{slug2?}/{slug3?}', [PageController::class, 'slug']);

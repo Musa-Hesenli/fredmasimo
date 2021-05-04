@@ -6,34 +6,13 @@ use Illuminate\Http\Request;
 use App;
 use Session;
 use App\Models\Slug;
-use App\About;
-use App\Sertificate;
-use App\Slide;
-use App\ProductsSection;
 use App\Product;
-use App\AboutSection;
-use App\CarculatorSection;
-use App\HomeSeo;
-use App\NewsSeo;
-use App\News;
 use App\Size;
-use App\Surface;
-use App\Colour;
-use App\Assorment;
-use App\CalculatorOption;
-use App\ContactSeo;
-use App\Contact;
-use App\ProductionsSeo;
-use App\Production;
-use App\VacanciesSeo;
-use App\Vacancy;
-use App\HeaderFooter;
-use App\ProductsSeo;
-use App\ContactUss;
 use App\Models\AboutDataAndSeo;
 use App\Models\Barber;
 use App\Models\Comment;
 use App\Models\ContactDataAndSeo;
+use App\Models\CustomerMessage;
 use App\Models\GalleryCategory;
 use App\Models\GalleryDataSeo;
 use App\Models\GalleryImage;
@@ -47,10 +26,9 @@ use App\Models\Service;
 use App\Models\ServicesDataAndSeo;
 use App\Models\Slider;
 use App\Models\Subscriber;
-use App\SearchPage;
-use Validator;
-use Mail;
-use Cookie;
+
+use Illuminate\Contracts\Session\Session as SessionSession;
+use Illuminate\Support\Facades\Session as FacadesSession;
 
 class PageController extends Controller
 {
@@ -76,12 +54,8 @@ class PageController extends Controller
         if ($count == 1) :
             $slug_url = str_replace('#', '', rawurldecode($explodeUrl[3]));
             if ($slug_url !== '') :
-                if (in_array($slug_url, ['pl', 'en'])) :
+                if (in_array($slug_url, ['en'])) :
                     if (in_array($request->lang, ['pl'])) :
-                        Session::put('locale', $request->lang);
-                        App::setlocale($request->lang);
-                        return $new_url = $protocol . $_SERVER['HTTP_HOST'] . '/' . $request->lang;
-                    elseif (in_array($request->lang, ['pl'])) :
                         Session::put('locale', $request->lang);
                         App::setlocale($request->lang);
                         return $new_url = $protocol . $_SERVER['HTTP_HOST'];
@@ -176,8 +150,8 @@ class PageController extends Controller
         return Slug::withTranslation('en')->orderBy('order')->get();
     }
 
-    public function index($locale)
-    {
+    public function index($locale) {
+        
         $lang = $this->locale($locale);
         $menu = $this->menu();
         $home_seo = HomeDataAndSeo::withTranslation('en')->first();
@@ -231,16 +205,19 @@ class PageController extends Controller
     }
 
     // Products functions begin
-    public function products($locale, $slug2 = null){
-        if($slug2) {
+    public function products($locale, $slug2 = null, $slug3 = null){
+        if($slug2 and !$slug3) {
             return $this->products_filter($locale, $slug2);
+        }
+        if($slug2 and $slug3) {
+            return $this->product_in($locale, $slug2, $slug3);
         }
         $lang = $this->locale($locale);
         $menu = $this->menu();
         $home_seo = HomeDataAndSeo::withTranslation('en')->first();
         $seo = ModelsProductsSeo::withTranslation('en')->first();
         $categories = ProductCategory::withTranslation('en')->get();
-        $products = ModelsProduct::withTranslation('en')->with('category_data')->paginate(6);
+        $products = ModelsProduct::withTranslation('en')->with('category_data')->get();
         return view('pages.products', compact('menu', 'home_seo', 'seo','categories', 'products'));
     }
     public function products_filter($locale, $category) {
@@ -251,20 +228,28 @@ class PageController extends Controller
         $category = ProductCategory::where('slug', $category)->first();
         $category =  $category['id'];
         $categories = ProductCategory::withTranslation('en')->get();
-        $products = ModelsProduct::withTranslation('en')->whereTranslation('category', $category)->with('category_data')->paginate(6);
+        $products = ModelsProduct::withTranslation('en')->whereTranslation('category', $category)->with('category_data')->get();
         return view('pages.products', compact('menu', 'home_seo', 'seo','categories', 'products'));
     }
     public function search_products(Request $query) {
-        return $query;
-        // $lang = $this->locale($locale);
         $menu = $this->menu();
         $home_seo = HomeDataAndSeo::withTranslation('en')->first();
         $seo = ModelsProductsSeo::withTranslation('en')->first();
         $categories = ProductCategory::withTranslation('en')->get();
-        $products = ModelsProduct::withTranslation('en')->whereTranslation('name', 'LIKE','%' . $query['q'] . '%')->with('category_data')->paginate(6);
+        $products = ModelsProduct::withTranslation('en')->whereTranslation('name', 'LIKE','%' . $query['query'] . '%')->with('category_data')->get();
+        
         return view('pages.products', compact('menu', 'home_seo', 'seo','categories', 'products'));
     }
-
+    public function product_in($locale, $slug2, $slug3) {
+        $lang = $this->locale($locale);
+        $menu = $this->menu();
+        $home_seo = HomeDataAndSeo::withTranslation('en')->first();
+        $category = ProductCategory::where('slug', $slug2)->first();
+        $category =  $category['id'];
+        $product = ModelsProduct::withTranslation('en')->where('category', $category)->whereTranslation('slug', $slug3)->with('category_data')->first();
+        $seo = ModelsProductsSeo::withTranslation('en')->first();
+        return view('pages.product-in', compact('menu', 'product', 'home_seo', 'seo'));
+    }
     // Products function end
 
     public function price($locale) {
@@ -285,5 +270,23 @@ class PageController extends Controller
         $categories = ProductCategory::withTranslation('en')->get();
         $price_list = PriceList::withTranslation('en')->get();
         return view('pages.contact', compact('menu', 'home_seo', 'seo', 'price_list'));
+    }
+
+    public function add_message(Request $request) {
+        $this->validate($request, [
+            'name' => 'required|max:255',
+            'email' => 'required|max:255',
+            'message' => 'required|max:6000'
+        ]);
+        $message = new CustomerMessage();
+        $message->name = $request['name'];
+        $message->email = $request['email'];
+        $message->message = $request['message'];
+        if($message->save()) {
+            FacadesSession::flash('success', "Thank you for message");
+        } else {
+            FacadesSession::flash('error', "There was an error");
+        }
+        return redirect()->back();
     }
 }

@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-lg-3 col-md-6 sm-padding">
                 <div class="footer_widget">
-                    <img class="mb-15" src="img/logo.png" alt="Brand">
+                    <img class="mb-15" src="{{ asset('img/logo.png') }}" alt="Brand">
                     <p>{{ $home_seo->getTranslatedAttribute('footer_description') }}</p>
                     <ul class="widget_social">
                         <li><a href="https://www.facebook.com/fredmasimo.barbershop" target="_blank"><i class="social_facebook"></i></a></li>
@@ -33,6 +33,7 @@
                     <h3>{{ $home_seo->getTranslatedAttribute('footer_form_title') }}</h3>
                     <div class="subscribe_form">
                         <form action="/add-subscriber" method="POST" class="subscribe_form">
+                            @csrf
                             <input type="email" name="email" id="subs-email" class="form_input" placeholder="{{ $home_seo->getTranslatedAttribute('footer_email_placeholder') }}">
                             <button type="submit" class="submit">{{ $home_seo->getTranslatedAttribute('footer_send_button') }}</button>
                             <div class="clearfix"></div>
@@ -55,9 +56,25 @@
                 <div class="copyright">&copy; <script type="text/javascript"> document.write(new Date().getFullYear())</script> {{ $home_seo->getTranslatedAttribute('about_section_start_text') }}</div>
             </div>
             <div class="col-md-6 xs-padding">
+                @php
+                    $all_url = "";
+                    $all_slug = $menu->where('widget', "all_services");
+                    $all_name = "";
+                    $price_list_url = "";
+                    $price_list_slug = $menu->where('widget', 'price');
+                    $price_list_name = "";
+                    foreach ($all_slug as $value) {
+                        $all_url = $value->getTranslatedAttribute('slug');
+                        $all_name = $value->getTranslatedAttribute('name');
+                    }
+                    foreach ($price_list_slug as $s) {
+                        $price_list_name = $s->getTranslatedAttribute('name');
+                        $price_list_url = $s->getTranslatedAttribute('slug');
+                    }
+                @endphp
                 <ul class="footer_social">
-                    <li><a href="all-services.php">All Serice</a></li>
-                    <li><a href="pricelist.php">Price List</a></li>
+                    <li><a href="{{ url($all_url) }}">{{ $all_name }}</a></li>
+                    <li><a href="{{ url($price_list_url) }}">{{ $price_list_name }}</a></li>
                     <li><a href="https://booksy.com/en-pl/79738_fred-masimo-barbershop_barber-shop_3_warszawa" target="_blank">{{ $home_seo->getTranslatedAttribute('slider_button') }}</a></li>
                 </ul>
             </div>

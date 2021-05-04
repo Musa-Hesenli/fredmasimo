@@ -41,27 +41,31 @@
                     </div>
                 </div>
                 <div class="col-lg-6 sm-padding">
+                    @if (Session::has('success'))
+                        <div class="alert alert-success">{{ Session::get('success') }}</div>
+                    @endif
                     <div class="contact-form">
-                        <form action="contact.php" method="post" id="ajax_form" class="form-horizontal">
+                        <form action="/add-message" method="post" id="" class="form-horizontal">
+                            @csrf
                             <div class="form-group colum-row row">
                                 <div class="col-sm-6">
-                                    <input type="text" id="name" name="name" class="form-control" placeholder="Name"
+                                    <input type="text" maxlength="255" id="name" name="name" class="form-control" placeholder="{{ $seo->getTranslatedAttribute('name_input') }}"
                                         required>
                                 </div>
                                 <div class="col-sm-6">
-                                    <input type="email" id="email" name="email" class="form-control" placeholder="Email"
-                                        required>
+                                    <input type="email"  id="email" name="email" class="form-control" placeholder="{{ $seo->getTranslatedAttribute('email_input') }}"
+                                        required maxlength="255">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-12">
                                     <textarea id="message" name="message" cols="30" rows="5" class="form-control message"
-                                        placeholder="Message" required></textarea>
+                                       maxlength="6000" placeholder="{{ $seo->getTranslatedAttribute('message_input') }}" required></textarea>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-12">
-                                    <button id="submit" class="default_btn" type="submit">Send Message</button>
+                                    <button id="submit" class="default_btn" type="submit">{{ $seo->getTranslatedAttribute('send_button') }}</button>
                                 </div>
                             </div>
                             <div id="form-messages" class="alert" role="alert"></div>

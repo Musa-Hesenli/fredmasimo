@@ -6,6 +6,7 @@
     <meta name="keywords" content="{{ $seo->getTranslatedAttribute('seo_keywords') }}">
     <title>{{ $seo->getTranslatedAttribute('seo_title') }}</title>
 @endsection
+
 @section('content')
 <section class="page_header d-flex align-items-center">
     <div class="container">
@@ -48,7 +49,7 @@
                     </li>
                     <li class="col-lg-3 col-md-6 padding-15 single_item {{ $images[$i+1]->filter->getTranslatedAttribute('fliter') }}">
                 		<figure class="portfolio_item">
-                			<img src="{{ asset('storage/' . $images[$i+1]->image) }}" alt="Portfolio Item">
+                			<img style="" src="{{ asset('storage/' . $images[$i+1]->image) }}" alt="Portfolio Item">
                 			<figcaption class="overlay">
                 				<a href="{{ asset('storage/' . $images[$i+1]->image) }}" class="img_popup"></a>
                 			</figcaption>

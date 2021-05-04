@@ -14,6 +14,10 @@ class ContactDataAndSeo extends Model
         "seo_keywords",
         "about_title",
         "about_content",
-        "contact_info"
+        "contact_info",
+        'name_input',
+        'email_input',
+        'message_input',
+        'send_button'
     ];
 }

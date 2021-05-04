@@ -30,8 +30,8 @@
                     <div class="sidebar-wrap">
                         <div class="widget-content">
 
-                            <form action="#" method="GET" class="search-form">
-                                <input type="text" class="form-control"
+                            <form action="/search-products/" method="GET" class="search-form">
+                                <input name="query" type="text" class="form-control"
                                     placeholder="{{ $seo->getTranslatedAttribute('search_input_text') }}">
                                 <button class="search-btn" type="submit"><i class="fa fa-search"></i></button>
                             </form>
@@ -61,6 +61,11 @@
                         $button_text = $seo->getTranslatedAttribute('read_more_button');
                     @endphp
                     <div class="row blog-grid">
+                        @if (count($products) == 0)
+                           <div class="col-12 mt-3">
+                                <div class="alert alert-info">No product found</div>
+                           </div>
+                        @endif
                         @foreach ($products as $item)
                             <div class="col-sm-6 padding-15">
                                 <div class="blog-item">
@@ -71,9 +76,9 @@
                                         <span class="price-right"><a>{{ $item->price }} zł</a></span>
                                     </div>
                                     <div class="blog-content">
-                                        <h3><a href="#">{{ $item->getTranslatedAttribute('name') }}</a></h3>
+                                        <h3><a href="{{ url($url . '/' . $item->category_data->getTranslatedAttribute('slug') . '/' . $item->getTranslatedAttribute('slug')) }}">{{ $item->getTranslatedAttribute('name') }}</a></h3>
                                         <p>{{ $item->getTranslatedAttribute('description') }}</p>
-                                        <a href="product-scottish.php" class="read-more">{{ $button_text }}</a>
+                                        <a href="{{ url($url . '/' . $item->category_data->getTranslatedAttribute('slug') . '/' . $item->getTranslatedAttribute('slug')) }}" class="read-more">{{ $button_text }}</a>
                                     </div>
                                 </div>
                             </div>
